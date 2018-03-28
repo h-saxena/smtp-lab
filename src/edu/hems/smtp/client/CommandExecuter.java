@@ -47,7 +47,7 @@ public class CommandExecuter {
 		String smtpMessage = "";
 		
 		smtpMessage += "from: hsaxena@radar.gsw.edu \r\n";
-		smtpMessage += "to: hemantsaxena@yahoo.com \r\n";
+		smtpMessage += "to: java.hemant@gmail.com \r\n";
 		smtpMessage += "subject: smtp lab message \r\n";
 		smtpMessage += message;
 		

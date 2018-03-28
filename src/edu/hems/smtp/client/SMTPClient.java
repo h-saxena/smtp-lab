@@ -24,7 +24,7 @@ public class SMTPClient {
 			throw new Exception("250 reply not received from server.\n");
 		}
 		
-		String response4 = cmdExecutor.executeCommand(new Command("RCPT TO: " + "hemantsaxena@yahoo.com"));
+		String response4 = cmdExecutor.executeCommand(new Command("RCPT TO: " + "java.hemant@gmail.com"));
 		if (!response4.startsWith("250")) {
 			throw new Exception("250 reply not received from server.\n");
 		}
