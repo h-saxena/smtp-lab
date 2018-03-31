@@ -38,31 +38,33 @@ public class RelaySession implements Runnable {
             OutputStream output = clientSocket.getOutputStream();
 
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(input));
+            DataOutputStream os = new DataOutputStream(output);
                         
             
-            String line = inFromServer.readLine();
-
-            StringTokenizer tokens = new StringTokenizer(line);
-            tokens.nextToken(); 
+            String line = null; //inFromServer.readLine();            
             
-            System.out.println("----- Reading the incoming socket data ----");
-            while (!line.isEmpty()) {
-                System.out.println(line);
+            boolean keepItAlive = true;
+            while(keepItAlive) {
                 line = inFromServer.readLine();
+                //StringTokenizer tokens = new StringTokenizer(line);
+                //String command = tokens.nextToken(); 
+                System.out.println(line);
+                //System.out.println(command);
+                if(line.startsWith("QUIT")) {
+                    os.writeBytes("Thanks for using relay server\r\n");
+                    os.writeBytes("BYE\r\n");
+                    keepItAlive = false;
+                }
+                else {
+                	os.writeBytes("200 : " + line +  " : OK\r\n"  );
+                }
+                Thread.sleep(500);
             }
-            System.out.println("----- Reading socket Done ----");
-
-            DataOutputStream os = new DataOutputStream(output);
-            // Send the status line.
-            os.writeBytes("ok");
-
-            // Send a blank line
-            //os.writeBytes(CRLF);
 
             output.close();
             input.close();
             System.out.println("Request processed: " );
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             //report exception somewhere.
             e.printStackTrace();
         }
