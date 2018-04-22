@@ -8,6 +8,10 @@ package edu.hems.relay.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import edu.hems.smtp.client.CommandExecuter;
 
 /**
  *
@@ -15,12 +19,21 @@ import java.net.Socket;
  */
 public class MailRelayServer  implements Runnable {
 
-    protected int          serverPort   = 8080;
     protected ServerSocket serverSocket = null;
     protected boolean      isStopped    = false;
+    
+    protected Integer          serverPort   = null;
+    protected String relayToHost = null;
+    protected Integer relayToPort = null; 
+    
+    protected AtomicInteger counter = new AtomicInteger(0);
+    		
 
-    public MailRelayServer(int port){
+    public MailRelayServer(Integer port, String relayToHost, Integer relayToPort){
         this.serverPort = port;
+        
+        this.relayToHost = relayToHost;
+        this.relayToPort = relayToPort;
     }
 
     public void run(){
@@ -33,9 +46,18 @@ public class MailRelayServer  implements Runnable {
                 throw new RuntimeException(
                     "Error accepting client connection", e);
             }
+            CommandExecuter relayServerCmdExecutor = null;
+            if(relayToHost != null && relayToPort != null) {
+                try {
+                	relayServerCmdExecutor = new CommandExecuter();
+                	relayServerCmdExecutor.init(relayToHost, relayToPort);
+    			} catch (Exception e) {
+    				throw new RuntimeException("Error communicating to RelayToHost Server", e);
+    			}            	
+            }
             new Thread(
                 new RelaySession(
-                    clientSocket, "Multithreaded Server")
+                    clientSocket,relayServerCmdExecutor, "smtp-relay-session" + counter.incrementAndGet())
             ).start();
         }
         System.out.println("Server Stopped.") ;

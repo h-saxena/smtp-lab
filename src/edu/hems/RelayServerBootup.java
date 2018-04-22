@@ -14,8 +14,16 @@ import edu.hems.relay.server.MailRelayServer;
 public class RelayServerBootup {
 
     public static void main(String[] args) {
+		Integer serverPort = Integer.parseInt(System.getProperty("serverPort"));
 
-        MailRelayServer server = new MailRelayServer(4040);
+		String relayToHost = null;
+		relayToHost = System.getProperty("relayToHost");
+		
+		Integer relayToPort = null;
+		if(System.getProperty("relayToPort") != null)
+		relayToPort = Integer.parseInt(System.getProperty("relayToPort"));
+		
+        MailRelayServer server = new MailRelayServer(serverPort, relayToHost, relayToPort);
         new Thread(server).start();
         System.out.println("Mail Relay Server Started.") ;
     }
