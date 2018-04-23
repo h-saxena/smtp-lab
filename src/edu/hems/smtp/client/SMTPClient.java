@@ -7,9 +7,16 @@ import java.util.*;
 public class SMTPClient {
 
 	public static void main(String[] args) throws Exception {
+		String pcHost = System.getProperty("relayHost");
+		int pcPort = Integer.parseInt(System.getProperty("relayPort"));
+		
+		String fromEmail = "hsaxena@radar.gsw.edu";
+		String toEmail = "java.hemant@gmail.com";
+		String subject = "This is from Hemant SMTP Lab";
+		
 		CommandExecuter cmdExecutor = new CommandExecuter();
 		
-		String response1 = cmdExecutor.initCall("smtp.gswcm.net", 25);
+		String response1 = cmdExecutor.initCall(pcHost, pcPort);
 		if (!response1.startsWith("220")) {
 			throw new Exception("220 reply not received from server.\n");
 		}
@@ -19,12 +26,12 @@ public class SMTPClient {
 			throw new Exception("250 reply not received from server.\n");
 		}
 		
-		String response3 = cmdExecutor.executeCommand(new Command("MAIL From: " + "hsaxena@radar.gsw.edu"));
+		String response3 = cmdExecutor.executeCommand(new Command("MAIL From: " + fromEmail));
 		if (!response3.startsWith("250")) {
 			throw new Exception("250 reply not received from server.\n");
 		}
 		
-		String response4 = cmdExecutor.executeCommand(new Command("RCPT TO: " + "java.hemant@gmail.com"));
+		String response4 = cmdExecutor.executeCommand(new Command("RCPT TO: " + toEmail));
 		if (!response4.startsWith("250")) {
 			throw new Exception("250 reply not received from server.\n");
 		}
@@ -42,7 +49,7 @@ public class SMTPClient {
 				"\r\n" + 
 				"--\r\n" + 
 				"Hemant\r\n";
-		String response6= cmdExecutor.executeMessage(message);
+		String response6= cmdExecutor.executeMessage(message, subject, fromEmail, toEmail);
 		if (!response6.startsWith("250")) {
 			throw new Exception("250 reply not received from server.\n");
 		}

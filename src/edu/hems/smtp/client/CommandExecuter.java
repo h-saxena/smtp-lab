@@ -50,15 +50,22 @@ public class CommandExecuter {
 		
 		return response;
 	}
-	
-	public String executeMessage(String message) throws IOException {
+
+	public void executeCommandWithNoAck(Command cmd) throws UnsupportedEncodingException, IOException {
+		String cmdStr = cmd.getCommand();
+		cmdStr+="\r\n";
+		
+		writeRequest(cmdStr);
+	}
+
+	public String executeMessage(String message, String subject, String fromEmail, String toEmail) throws IOException {
 		String response;
 		
 		String smtpMessage = "";
 		
-		smtpMessage += "from: hsaxena@radar.gsw.edu \r\n";
-		smtpMessage += "to: java.hemant@gmail.com \r\n";
-		smtpMessage += "subject: smtp lab message \r\n";
+		smtpMessage += "from: " + fromEmail + " \r\n";
+		smtpMessage += "to: " + toEmail + " \r\n";
+		smtpMessage += "subject: " + subject + " \r\n";
 		smtpMessage += message;
 		
 		smtpMessage += "\r\n.\r\n";

@@ -3,7 +3,9 @@ package edu.hems.relay.server.cmd;
 public class BEGIN extends BaseSmtpCmd {
 	
 	public BEGIN() {
-		permittedCmd.add(HELO.class.getSimpleName());
+		this.permittedCmd.add(HELO.class.getSimpleName());
+		this.successReplyCode = "220";
+		this.responseMsg = this.successReplyCode + " *** Welcome to HEMANT SMTP RELAY SERVER *** ";
 	}
 
 }

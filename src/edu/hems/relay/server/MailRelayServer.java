@@ -50,7 +50,8 @@ public class MailRelayServer  implements Runnable {
             if(relayToHost != null && relayToPort != null) {
                 try {
                 	relayServerCmdExecutor = new CommandExecuter();
-                	relayServerCmdExecutor.init(relayToHost, relayToPort);
+                	String connectionResponse = relayServerCmdExecutor.initCall(relayToHost, relayToPort);
+                	System.out.println(connectionResponse);
     			} catch (Exception e) {
     				throw new RuntimeException("Error communicating to RelayToHost Server", e);
     			}            	

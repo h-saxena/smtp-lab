@@ -7,28 +7,57 @@ import java.util.Arrays;
 import edu.hems.smtp.client.CommandExecuter;
 
 public class RelayServerSmtpCmdHandler {
+    final static String CRLF = "\r\n";
 	
 	public static BaseSmtpCmd handle(String cmdTextRecieved, BaseSmtpCmd lastCmdPermitted, CommandExecuter relayServerCmdExecutor) {
 		BaseSmtpCmd smtpCmdExecuted = null;
 		
-		String[] tokens = cmdTextRecieved.split("\\s+");
-		String smtpCmd = tokens[0];
+		BaseSmtpCmd reqSmtpCmd = null;
+		String smtpCmd = null;
 		
-		BaseSmtpCmd reqSmtpCmd = getSmtpCmdInstance(smtpCmd);
-		reqSmtpCmd.setCmd(cmdTextRecieved);
+		if(lastCmdPermitted.getClass().equals(DATA.class) || lastCmdPermitted.getClass().equals(MSG.class)) {
+			if(cmdTextRecieved.trim().equals(".")) {
+				reqSmtpCmd = getSmtpCmdInstance(MSGEND.class.getSimpleName());
+				reqSmtpCmd.setCmd(CRLF+"."+CRLF);
+			}
+			else {
+				reqSmtpCmd = getSmtpCmdInstance("MSG");
+				reqSmtpCmd.setCmd(cmdTextRecieved + CRLF);
+			}
+		}
+		else { // for every other type of commands 
+			
+			String[] tokens = cmdTextRecieved.split("\\s+");
+			smtpCmd = tokens[0];
+			
+			reqSmtpCmd = getSmtpCmdInstance(smtpCmd);
+			reqSmtpCmd.setCmd(cmdTextRecieved);
+			
+		}
+		
 		
 		if(reqSmtpCmd.isPermittedAnytime || lastCmdPermitted.isCmdPermittedNext(reqSmtpCmd)) {
+			smtpCmdExecuted = reqSmtpCmd;
 			
 			if(relayServerCmdExecutor != null) {
 				try {
-					String response = relayServerCmdExecutor.executeCommand(reqSmtpCmd.getCmd());
-					if(response.startsWith(reqSmtpCmd.getSuccessReplyCode())) {
-						reqSmtpCmd.setResponseMsg(response);
-						smtpCmdExecuted = reqSmtpCmd;
+					
+					if(reqSmtpCmd.getClass().equals(MSG.class)) {
+						relayServerCmdExecutor.executeCommandWithNoAck(reqSmtpCmd.getCmd());
+						System.out.println(">>>>>>>>>>>>> Handler - Command MSG Exec: " + reqSmtpCmd.getCmd().getCommand());
 					}
 					else {
-						throw new RuntimeException("Reply code not as expected. " + response);
+						String response = relayServerCmdExecutor.executeCommand(reqSmtpCmd.getCmd());
+						if(response.startsWith(reqSmtpCmd.getSuccessReplyCode())) {
+							reqSmtpCmd.setResponseMsg(response);
+							//smtpCmdExecuted = reqSmtpCmd;
+						}
+						else {
+							throw new RuntimeException("Reply code not as expected. " + response);
+						}
+						
 					}
+					
 				} catch (Exception e) {
 					new RuntimeException("Unable to execute request command: " + cmdTextRecieved);
 				} 
@@ -38,7 +67,7 @@ public class RelayServerSmtpCmdHandler {
 				// if no relay server configured to pass the smtp command
 				// then just have simple reply back
 				
-				smtpCmdExecuted = reqSmtpCmd;
+				//smtpCmdExecuted = reqSmtpCmd;
 				if (reqSmtpCmd.getClass().equals(QUIT.class)) {
 					smtpCmdExecuted.setResponseMsg(smtpCmdExecuted.getSuccessReplyCode() + " " + "BYE");
 				} else {
@@ -77,10 +106,8 @@ public class RelayServerSmtpCmdHandler {
 			smtpCmd = new QUIT();
 		else if(cmd.equalsIgnoreCase("HELP"))
 			smtpCmd = new HELP();
-		else if(cmd.equalsIgnoreCase("."))
-			smtpCmd = new MSGEND();
 		else 
-			throw new RuntimeException("Invalide or Unsupported Command");
+			throw new RuntimeException("Invalid or Unsupported Command");
 		
 		return smtpCmd;
 	}

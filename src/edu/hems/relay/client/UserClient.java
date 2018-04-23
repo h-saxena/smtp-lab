@@ -27,15 +27,18 @@ public class UserClient {
 			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(servSocket.getInputStream()));
 
 			if (servSocket != null && os != null && is != null) {
+				System.out.println("Connection Initiation: " + inFromServer.readLine());
+				
 				Scanner s = new Scanner(System.in);
-
+				os.writeBytes("USER_CLIENT\r\n");
 				while (true) {
 				    System.out.print("Enter command: ");
 				    try {
 					    String smtpCommand = s.nextLine();
 					    
 						if(smtpCommand == null || smtpCommand.isEmpty() )
-							throw new RuntimeException("Invalid command: " + smtpCommand);
+							continue;
+							//throw new RuntimeException("Invalid command: " + smtpCommand);
 						
 						System.out.println("request: " + smtpCommand);
 						os.writeBytes(smtpCommand + " \r\n");

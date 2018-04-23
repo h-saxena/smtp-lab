@@ -19,6 +19,7 @@ import java.net.Socket;
 import java.util.StringTokenizer;
 
 import edu.hems.relay.server.cmd.BaseSmtpCmd;
+import edu.hems.relay.server.cmd.MSG;
 import edu.hems.relay.server.cmd.QUIT;
 import edu.hems.relay.server.cmd.RelayServerSmtpCmdHandler;
 import edu.hems.smtp.client.CommandExecuter;
@@ -34,6 +35,9 @@ public class RelaySession implements Runnable {
     protected Socket clientSocket = null;
     protected String sessionName = null;
     CommandExecuter relayServerCmdExecutor = null;
+    
+    // is the client prepared to test it is calling
+    boolean isUserClient = false;
     
     BaseSmtpCmd lastPermittedCmd = RelayServerSmtpCmdHandler.getSmtpCmdInstance("BEGIN");
 
@@ -54,9 +58,10 @@ public class RelaySession implements Runnable {
             DataOutputStream os = new DataOutputStream(output);
                         
             
-            String line = null; //inFromServer.readLine();            
-            
+            String line = null; //inFromServer.readLine();                        
             boolean keepItAlive = true;
+            
+            os.writeBytes(lastPermittedCmd.getResponseMsg() + CRLF);
             while(keepItAlive) {
                 Thread.sleep(800);
 
@@ -64,13 +69,23 @@ public class RelaySession implements Runnable {
 
                 if(line == null)
                 	continue;
+                else if (line.equals("USER_CLIENT")) {
+                	this.isUserClient = true;
+                	continue;
+                }
                 
                 System.out.println(this.sessionName + " - " + "Command Recieved: " + line);
 
             	try {
 					lastPermittedCmd =  RelayServerSmtpCmdHandler.handle(line, lastPermittedCmd, this.relayServerCmdExecutor);
-					os.writeBytes(lastPermittedCmd.getResponseMsg()+ CRLF);
 					System.out.println(this.sessionName + " - Last executed Cmd: " + lastPermittedCmd.getClass().getName());
+					
+					if( ! lastPermittedCmd.getClass().equals(MSG.class))
+						os.writeBytes(lastPermittedCmd.getResponseMsg()+ CRLF);	
+					else if(isUserClient) {
+						os.writeBytes("Got the line. End message with only a dot in a line."+ CRLF);
+					}
+					
 					if(lastPermittedCmd.getClass().equals(QUIT.class)) {
 						keepItAlive = false;
 					}
