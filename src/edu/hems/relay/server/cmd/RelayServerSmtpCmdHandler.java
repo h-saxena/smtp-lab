@@ -27,7 +27,7 @@ public class RelayServerSmtpCmdHandler {
 						smtpCmdExecuted = reqSmtpCmd;
 					}
 					else {
-						throw new RuntimeException(response);
+						throw new RuntimeException("Reply code not as expected. " + response);
 					}
 				} catch (Exception e) {
 					new RuntimeException("Unable to execute request command: " + cmdTextRecieved);
@@ -35,12 +35,12 @@ public class RelayServerSmtpCmdHandler {
 				
 			}
 			else {
-				smtpCmdExecuted = reqSmtpCmd;
 				// if no relay server configured to pass the smtp command
 				// then just have simple reply back
 				
+				smtpCmdExecuted = reqSmtpCmd;
 				if (reqSmtpCmd.getClass().equals(QUIT.class)) {
-					smtpCmdExecuted.setResponseMsg("BYE");
+					smtpCmdExecuted.setResponseMsg(smtpCmdExecuted.getSuccessReplyCode() + " " + "BYE");
 				} else {
 					smtpCmdExecuted.setResponseMsg(smtpCmdExecuted.getSuccessReplyCode() + " " + cmdTextRecieved + "  Ok");
 				}
@@ -85,12 +85,4 @@ public class RelayServerSmtpCmdHandler {
 		return smtpCmd;
 	}
 	
-	public static void main(String[] args) {
-		String str = "HELO pg-01 ";
-		String[] splited = str.split("\\s+");
-		System.out.println(Arrays.asList(splited));
-		
-		System.out.println(MAIL.class.getSimpleName());
-	}
-
 }

@@ -15,7 +15,17 @@ public class CommandExecuter {
 	BufferedReader br;
 	OutputStream os;
 	
-	public String init(String hostName, int port) throws UnknownHostException, IOException {
+	public void init(String hostName, int port) throws UnknownHostException, IOException {
+		emailSocket = new Socket(hostName, port);
+		
+		InputStream is = emailSocket.getInputStream();
+		br = new BufferedReader(new InputStreamReader(is));
+
+		// Get a reference to the socket's output stream.
+		os = emailSocket.getOutputStream();
+	}
+	
+	public String initCall(String hostName, int port) throws UnknownHostException, IOException {
 		emailSocket = new Socket(hostName, port);
 		
 		InputStream is = emailSocket.getInputStream();
@@ -25,18 +35,18 @@ public class CommandExecuter {
 		os = emailSocket.getOutputStream();
 		return readResponse();
 	}
-	
+
 	public String executeCommand(Command cmd) throws UnsupportedEncodingException, IOException {
 		String response = null;
 		
 		String cmdStr = cmd.getCommand();
 		cmdStr+="\r\n";
 		
-		System.out.println("Command: " + cmdStr);		
+		System.out.println("CommandExecuter ---> Command: " + cmdStr);		
 		writeRequest(cmdStr);
 		
 		response = readResponse();
-		System.out.println("Cmd Response: " + response);
+		System.out.println("CommandExecuter ---> Cmd Response: " + response);
 		
 		return response;
 	}
@@ -55,7 +65,7 @@ public class CommandExecuter {
 		writeRequest(smtpMessage);
 		
 		response = readResponse();
-		System.out.println("Message Response: " + response);
+		System.out.println("CommandExecuter ---> Message Response: " + response);
 		
 		return response;
 	}

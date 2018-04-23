@@ -14,4 +14,6 @@ java -DserverPort=3000 -DrelayToHost=PG-03 -DrelayToPort=3000 -cp ./bin edu.hems
 java -DrelayHost=PG-02 -DrelayPort=3000 -cp ./bin edu.hems.relay.client.UserClient
 
 
+# If directly need to test interaction with smtp.gswcm.net
+java -cp ./bin edu.hems.smtp.client.SMTPClient
 

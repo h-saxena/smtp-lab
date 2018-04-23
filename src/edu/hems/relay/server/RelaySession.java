@@ -65,53 +65,35 @@ public class RelaySession implements Runnable {
                 if(line == null)
                 	continue;
                 
-                System.out.println(this.sessionName + " : " + "Command Recieved: " + line);
+                System.out.println(this.sessionName + " - " + "Command Recieved: " + line);
 
             	try {
 					lastPermittedCmd =  RelayServerSmtpCmdHandler.handle(line, lastPermittedCmd, this.relayServerCmdExecutor);
 					os.writeBytes(lastPermittedCmd.getResponseMsg()+ CRLF);
-					
+					System.out.println(this.sessionName + " - Last executed Cmd: " + lastPermittedCmd.getClass().getName());
 					if(lastPermittedCmd.getClass().equals(QUIT.class)) {
 						keepItAlive = false;
 					}
 				} catch (Exception e) {
-					os.writeBytes(e.getMessage()+ CRLF);
+					os.writeBytes("Error executing command: " + e.getMessage()+ CRLF);
 				}
                 
-//                if(relayServerCmdExecutor != null) {
-//                	try {
-//						lastPermittedCmd =  RelayServerSmtpCmdHandler.handle(line, lastPermittedCmd, this.relayServerCmdExecutor);
-//						os.writeBytes(lastPermittedCmd.getResponseMsg());
-//					} catch (Exception e) {
-//						os.writeBytes(e.getMessage());
-//					}
-//                } 
-//                // if no relay server configured to pass the smtp command
-//                // then just have simple reply back
-//                else {
-//                    if(line.startsWith("QUIT")) {
-//                        os.writeBytes("Thanks for using relay server\r\n");
-//                        os.writeBytes("BYE\r\n");
-//                        keepItAlive = false;
-//                    }
-//                    else {
-//                    	os.writeBytes("250  " + line +  "  Ok\r\n"  );
-//                    }
-//                	
-//                }
-
             }
 
             output.close();
             input.close();
             
-            if(relayServerCmdExecutor != null)
-            	relayServerCmdExecutor.close();
-            System.out.println(this.sessionName + " : sesson is done " );
         } catch (IOException | InterruptedException e) {
-            //report exception somewhere.
-            e.printStackTrace();
+        	System.out.println(this.sessionName + " - Error1: " + e.getMessage());
         }
+        if(relayServerCmdExecutor != null)
+			try {
+				relayServerCmdExecutor.close();
+			} catch (IOException e) {
+	        	System.out.println(this.sessionName + " - Error2: " + e.getMessage());
+			}
+        
+        System.out.println(this.sessionName + " : sesson is done " );
     }
 
 }

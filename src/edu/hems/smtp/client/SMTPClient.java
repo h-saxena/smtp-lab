@@ -9,7 +9,7 @@ public class SMTPClient {
 	public static void main(String[] args) throws Exception {
 		CommandExecuter cmdExecutor = new CommandExecuter();
 		
-		String response1 = cmdExecutor.init("smtp.gswcm.net", 25);
+		String response1 = cmdExecutor.initCall("smtp.gswcm.net", 25);
 		if (!response1.startsWith("220")) {
 			throw new Exception("220 reply not received from server.\n");
 		}

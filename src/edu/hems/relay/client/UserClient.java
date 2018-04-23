@@ -41,8 +41,8 @@ public class UserClient {
 						os.writeBytes(smtpCommand + " \r\n");
 						String responseline = inFromServer.readLine();
 						System.out.println("response: " + responseline);
-
-						if (responseline.indexOf("BYE") != -1)
+						
+						if (responseline.toUpperCase().indexOf("BYE") != -1)
 							break;
 						
 						
