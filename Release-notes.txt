@@ -1,0 +1,9 @@
+Release notes as of 4/25
+All the functionalities are working as listed below:
+- Command FSM implementation
+- multiple session handling via multiple thread.
+- Command looping
+- multiple hop relay servers.
+- command by command user interaction client
+
+

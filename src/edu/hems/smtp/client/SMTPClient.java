@@ -10,8 +10,8 @@ public class SMTPClient {
 		String pcHost = System.getProperty("relayHost");
 		int pcPort = Integer.parseInt(System.getProperty("relayPort"));
 		
-		String fromEmail = "hsaxena@radar.gsw.edu";
-		String toEmail = "java.hemant@gmail.com";
+		String fromEmail = System.getProperty("mailFrom");
+		String toEmail = System.getProperty("mailTo");
 		String subject = "This is from Hemant SMTP Lab";
 		
 		CommandExecuter cmdExecutor = new CommandExecuter();
@@ -48,7 +48,7 @@ public class SMTPClient {
 				"\r\n" + 
 				"\r\n" + 
 				"--\r\n" + 
-				"Hemant\r\n";
+				"Tester\r\n";
 		String response6= cmdExecutor.executeMessage(message, subject, fromEmail, toEmail);
 		if (!response6.startsWith("250")) {
 			throw new Exception("250 reply not received from server.\n");
